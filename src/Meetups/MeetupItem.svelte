@@ -1,3 +1,43 @@
+<script>
+  import { createEventDispatcher } from 'svelte';
+  import Button from './../UI/Button.svelte';
+  
+  export let id;
+  export let title;
+  export let subTitle;
+  export let imageUrl;
+  export let description;
+  export let address;
+  export let email;
+  export let isFav;
+
+  const dispatch = createEventDispatcher();
+</script>
+
+<article>
+  <header>
+    <h1>{title}</h1>
+    <h2>{subTitle}</h2>
+    <p>{address}</p>
+  </header>
+  <div class="image">
+    <img src={imageUrl} alt={title} />
+  </div>
+  <div class="content">
+    <p>{description}</p>
+  </div>
+  <footer>
+    <Button href="mailto:{email}" caption="Contact" />
+    <Button
+      type="button"
+      mode="outline"
+      caption={isFav ? 'Unfavorite' : 'Favorite'}
+      on:click={() => dispatch('toggleFavorite', id)}
+    />
+    <Button type="button" caption="Show Details" />
+  </footer>
+</article>
+
 <style>
   article {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
@@ -26,7 +66,7 @@
   h1 {
     font-size: 1.25rem;
     margin: 0.5rem 0;
-    font-family: "Roboto Slab", sans-serif;
+    font-family: 'Roboto Slab', sans-serif;
   }
 
   h1.is-favorite {
@@ -50,21 +90,8 @@
   div {
     text-align: right;
   }
-</style>
 
-<article>
-  <header>
-    <h1>TITLE</h1>
-    <h2>SUBTITLE</h2>
-  </header>
-  <div class="image">
-    <img src="" alt="" />
-  </div>
-  <div class="content">
-    <p />
-  </div>
-  <footer>
-    <button>Show Details</button>
-    <button>Favorite</button>
-  </footer>
-</article>
+  .content {
+    height: 4rem;
+  }
+</style>
