@@ -1,78 +1,61 @@
 <script>
+  import meetups from './Meetups/meetups-store';
   import Header from './UI/Header.svelte';
   import Button from './UI/Button.svelte';
   import MeetupGrid from './Meetups/MeetupGrid.svelte';
   import EditMeetup from './Meetups/EditMeetup.svelte';
-
-  let meetups = [
-    {
-      id: 'm1',
-      title: 'Coding Bootcamp',
-      subtitle: 'Learn to code in 2 hours',
-      description:
-        'In this meetup, we will have some experts that teach you how to code!',
-      imageUrl:
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Caffe_Nero_coffee_bar%2C_High_St%2C_Sutton%2C_Surrey%2C_Greater_London.JPG/800px-Caffe_Nero_coffee_bar%2C_High_St%2C_Sutton%2C_Surrey%2C_Greater_London.JPG',
-      address: '27th Nerd Road, 32523 New York',
-      contactEmail: 'code@test.com',
-      isFavorite: true,
-    },
-    {
-      id: 'm2',
-      title: 'Swim Together',
-      subtitle: "Let's go for some swimming",
-      description: 'We will simply swim some rounds!',
-      imageUrl:
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Olympic_swimming_pool_%28Tbilisi%29.jpg/800px-Olympic_swimming_pool_%28Tbilisi%29.jpg',
-      address: '27th Nerd Road, 32523 New York',
-      contactEmail: 'swim@test.com',
-      isFavorite: false,
-    },
-  ];
+  import MeetupDetail from './Meetups/MeetupDetail.svelte';
 
   let editMode;
+  let editedId;
+  let page = 'overview';
+  let pageData = {};
 
-  function addMeetup(event) {
-    const newMeetup = {
-      id: Math.random(),
-      ...event?.detail,
-    };
-    // meetups.push(newMeetup); // DOES NOT WORK!!
-    meetups = [newMeetup, ...meetups];
+  function savedMeetup() {
     editMode = null;
-  }
-
-  function toggleFavorite(event) {
-    const id = event.detail;
-    const updatedMeetup = { ...meetups.find((q) => q.id === id) };
-    updatedMeetup.isFavorite = !updatedMeetup.isFavorite;
-    const meetupIndex = meetups.findIndex((m) => m.id === id);
-    const updatedMeetups = [...meetups];
-    updatedMeetups[meetupIndex] = updatedMeetup;
-    meetups = updatedMeetups;
+    editedId = null;
   }
 
   function cancelEdit() {
     editMode = null;
+    editedId = null;
+  }
+
+  function showDetails(event) {
+    page = 'details';
+    pageData.id = event.detail;
+  }
+
+  function closeDetails() {
+    page = 'overview';
+    pageData = {};
+  }
+
+  function startEdit(event) {
+    editMode = 'edit';
+    editedId = event.detail;
   }
 </script>
 
 <Header />
 <main>
-  <div class="meetup-control">
-    <Button on:click={() => (editMode = 'add')}>New Meetup</Button>
-  </div>
-  {#if editMode === 'add'}
-    <EditMeetup on:save={addMeetup} on:cancel={cancelEdit} />
-  {:else}{/if}
-  <MeetupGrid {meetups} on:toggleFavorite={toggleFavorite} />
+  {#if page === 'overview'}
+    {#if editMode === 'edit'}
+      <EditMeetup id={editedId} on:save={savedMeetup} on:cancel={cancelEdit} />
+    {/if}
+    <MeetupGrid
+      meetups={$meetups}
+      on:showdetails={showDetails}
+      on:edit={startEdit}
+      on:add={() => (editMode = 'edit')}
+    />
+  {:else}
+    <MeetupDetail id={pageData.id} on:close={closeDetails} />
+  {/if}
 </main>
 
 <style>
   main {
     margin-top: 5rem;
-  }
-  .meetup-control {
-    margin: 1rem;
   }
 </style>

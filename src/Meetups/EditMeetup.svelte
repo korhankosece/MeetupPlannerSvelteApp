@@ -1,9 +1,12 @@
 <script>
+  import meetups from '../Meetups/meetups-store';
   import TextInput from '../UI/TextInput.svelte';
   import Button from '../UI/Button.svelte';
   import Modal from '../UI/Modal.svelte';
   import { createEventDispatcher } from 'svelte';
   import { isEmpty, isValidEmail } from '../helpers/validation';
+
+  export let id = null;
 
   let title = '';
   let subtitle = '';
@@ -11,6 +14,20 @@
   let email = '';
   let description = '';
   let imageUrl = '';
+
+  if (id) {
+    const unsubscribe = meetups.subscribe((items) => {
+      const selectedMeetup = items.find((i) => i.id === id);
+      title = selectedMeetup.title;
+      subtitle = selectedMeetup.subtitle;
+      address = selectedMeetup.address;
+      email = selectedMeetup.contactEmail;
+      description = selectedMeetup.description;
+      imageUrl = selectedMeetup.imageUrl;
+    });
+
+    unsubscribe();
+  }
 
   const dispatch = createEventDispatcher();
 
@@ -29,18 +46,32 @@
     emailValid;
 
   function submitForm() {
-    dispatch('save', {
+    const meetupData = {
       title,
       subtitle,
       address,
       email,
       description,
       imageUrl,
-    });
+    };
+
+    // meetups.push(newMeetup); // DOES NOT WORK!!
+    // lodadedMeetups = [newMeetup, ...lodadedMeetups];
+    if (id) {
+      meetups.updateMeetup(id, meetupData);
+    } else {
+      meetups.addMeetup(meetupData);
+    }
+    dispatch('save');
   }
 
   function cancel() {
     dispatch('cancel');
+  }
+
+  function deleteMeetup() {
+    meetups.removeMeetup(id);
+    dispatch('save');
   }
 </script>
 
@@ -105,6 +136,9 @@
       disabled={!formIsValid}>Save</Button
     >
     <Button type="button" on:click={cancel}>Cancel</Button>
+    {#if id}
+      <Button type="button" on:click={deleteMeetup}>Delete</Button>
+    {/if}
   </div>
 </Modal>
 
