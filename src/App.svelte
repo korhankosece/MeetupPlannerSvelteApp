@@ -1,10 +1,12 @@
+
+
 <script>
   import meetups from './Meetups/meetups-store';
   import Header from './UI/Header.svelte';
   import Button from './UI/Button.svelte';
-  import MeetupGrid from './Meetups/MeetupGrid.svelte';
+  import MeetupGrid from './routes/index.svelte';
   import EditMeetup from './Meetups/EditMeetup.svelte';
-  import MeetupDetail from './Meetups/MeetupDetail.svelte';
+  import MeetupDetail from '../static/MeetupDetail.svelte';
   import LoadingSpinner from './UI/LoadingSpinner.svelte';
   import Error from './UI/Error.svelte';
 
